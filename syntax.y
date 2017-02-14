@@ -2,6 +2,7 @@
 %{
 #include "lex.yy.c"
 #include "ir/translate.h"
+int yyerror(char* msg);
 %}
 
 /* declared types */
@@ -149,6 +150,6 @@ Args : Exp COMMA Args	{ expend(&$$, $1->lineno, "Args", 3, $1, $2, $3); }
 
 %%
 
-yyerror(char* msg) {
+int yyerror(char* msg) {
 	printf("Error type B at Line %d: ", yylineno);
 }

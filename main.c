@@ -1,6 +1,9 @@
 #include "syntax.tab.h"
 #include "tree/bt.h"
 
+void yyrestart (FILE *input_file  );
+int yyparse (void);
+
 int main(int argc, char** argv)
 {
 	if(argc <= 1)	return 1;
