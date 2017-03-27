@@ -32,7 +32,6 @@ void expend(struct Node **ptr, int ln, const char* t, int n, ...) {
 	//There maybe exist NULL struct Node pointer.
 	va_list arg_ptr;
 	va_start(arg_ptr, n);
-	struct Node* arr[10];
 	int i = 0;
 	while(!(arg = va_arg(arg_ptr, struct Node*))) i++;
 	if(i < n) {

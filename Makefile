@@ -1,9 +1,11 @@
 CC := gcc
-CFLAGS := -g -lfl -ly
+CFLAGS := -g -lfl -ly -Wall
 
 INC_FILE := $(shell find . -name "*.h")
 SRC_FILE := $(shell find . -path "./test" -prune -o -name "*.c" -print)
 SRC_FILE += syntax.tab.c
+
+.PHONY: lex syntax clean
 
 TARGET := parser
 

@@ -70,6 +70,7 @@ int type_match(V_type t1, V_type t2) {
 		}
 	}
 	//Log("finished");
+	return 0;
 }
 
 int args_match(list_node_Item *n1, list_node_Item *n2) {

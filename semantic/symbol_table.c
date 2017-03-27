@@ -41,7 +41,7 @@ void add_sys_func() {
 	item.type = vt;
 
 	list_node_Item *pItem = (list_node_Item*)malloc(sizeof(list_node_Item));
-	pItem->next == NULL;
+	pItem->next = NULL;
 	memcpy(&(pItem->data), &item, sizeof(Item));
 
 	pushSymbTable();
@@ -105,7 +105,7 @@ unsigned hash_pjw(char* name) {
 	unsigned val = 0, i;
 	for(; *name; ++name) {
 		val = (val << 2) + *name;
-		if(i = val & ~(SYMB_TABLE_SIZE - 1))
+		if((i = val & ~(SYMB_TABLE_SIZE - 1)) != 0)
 			val = (val ^ (i >> 12)) & (SYMB_TABLE_SIZE - 1);
 	}
 	return val;

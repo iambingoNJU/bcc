@@ -152,4 +152,5 @@ Args : Exp COMMA Args	{ expend(&$$, $1->lineno, "Args", 3, $1, $2, $3); }
 
 int yyerror(char* msg) {
 	printf("Error type B at Line %d: ", yylineno);
+	return 0;
 }
