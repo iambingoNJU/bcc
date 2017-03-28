@@ -27,13 +27,10 @@ struct Node {
 };
 
 struct Node* init_node(int, const char*, char*);
-
 struct Node* expand_node(const char* t, int n, ...);
 
 void free_tree(struct Node*);
-
 void display(struct Node*);
-
 void semantic_analyse(struct Node*);
 
 #endif

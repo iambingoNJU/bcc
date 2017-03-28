@@ -31,11 +31,11 @@ struct Node* expand_node(const char* t, int n, ...) {
 	tr->val[0] = '\0';
 	tr->is_terminal = 0;
 	tr->ns = NULL;
-	//There maybe exist NULL struct Node pointer.
 
 	va_list arg_ptr;
 	va_start(arg_ptr, n);
 	int i = 0;
+	//There maybe exist NULL struct Node pointer.
 	while(!(arg = va_arg(arg_ptr, struct Node*))) i++;
 	if(i < n) {
 		tr->fc = arg;
@@ -233,12 +233,6 @@ void semantic_analyse(struct Node *ast) {
 			if((strcmp(ast->fc->type, "INT") == 0)
 				|| (strcmp(ast->fc->type, "FLOAT") == 0)) {
 				ast->vt_syn = ast->fc->vt_syn;
-
-				// generate code
-				/*ast->var_name = new_temp();
-				list_push_back_InterCode(&(ast->code), gen_code(IC_ASSIGN, ast->var_name, ast->fc->val, NULL));
-				Log("%s := #%s\n", ast->var_name, ast->fc->val);
-				*/
 			} else if(strcmp(ast->fc->type, "ID") == 0) {
 				if(ast->fc->ns == NULL) { // variable reference
 					ast->vt_syn = query_var(ast->fc->val);
@@ -248,10 +242,6 @@ void semantic_analyse(struct Node *ast) {
 					ast->fc->is_var = 1;
 					ast->fc->vt_syn = ast->vt_syn;
 					ast->is_var = ast->fc->is_var;
-
-					/*ast->var_name = ast->fc->val;
-					Log("ID: %s\n", ast->var_name);
-					*/
 				} else {	// function calling
 					V_type vt = query_var(ast->fc->val);
 					if(vt != NULL) typeerror(11, ast->fc->lineno, ast->fc->val);
@@ -270,17 +260,6 @@ void semantic_analyse(struct Node *ast) {
 						ast->fc->vt_syn = ft->rtn_val;
 						ast->fc->vt_list = ft->args;
 					}
-
-					/*list_node_Item *args = ast->fc->ns->ns->vt_list;
-					while(args != NULL) {
-						list_push_back_InterCode(&(ast->code), gen_code(IC_ARG, args->data.name, NULL, NULL));
-						Log("ARG %s\n", args->data.name);
-						args = args->next;
-					}
-					ast->var_name = new_temp();
-					list_push_back_InterCode(&(ast->code), gen_code(IC_ECALL, ast->var_name, ast->fc->val, NULL));
-					Log("%s := CALL %s\n", ast->var_name, ast->fc->val);
-					*/
 				}
 			} else if(strcmp(ast->fc->type, "Exp") == 0) {
 				if(strcmp(ast->fc->ns->type, "ASSIGNOP") == 0) {
@@ -289,14 +268,6 @@ void semantic_analyse(struct Node *ast) {
 					if(ast->fc->is_var != 1)
 						typeerror(6, ast->fc->lineno, NULL);
 					ast->vt_syn = ast->fc->vt_syn;
-
-					/*list_merge_InterCode(&(ast->code), ast->fc->ns->ns->code);
-					list_push_back_InterCode(&(ast->code), gen_code(IC_ASSIGN, ast->fc->var_name, ast->fc->ns->ns->var_name, NULL));
-					ast->var_name = new_temp();
-					list_push_back_InterCode(&(ast->code), gen_code(IC_ASSIGN, ast->var_name, ast->fc->var_name, NULL));
-					Log("%s := %s\n", ast->fc->var_name, ast->fc->ns->ns->var_name);
-					Log("%s := %s\n", ast->var_name, ast->fc->var_name);
-					*/
 				} else if((strcmp(ast->fc->ns->type, "AND") == 0)
 					|| (strcmp(ast->fc->ns->type, "OR") == 0)) {
 					if(!(ast->fc->vt_syn && (ast->fc->vt_syn->kind == T_BASIC) &&
@@ -318,25 +289,6 @@ void semantic_analyse(struct Node *ast) {
 						typeerror(7, ast->fc->lineno, NULL);
 					} 
 					ast->vt_syn = ast->fc->vt_syn;
-
-					/*list_merge_InterCode(&(ast->code), ast->fc->code);
-					list_merge_InterCode(&(ast->code), ast->fc->ns->ns->code);
-					ast->var_name = new_temp();
-					if(strcmp(ast->fc->ns->type, "PLUS") == 0) {
-						list_push_back_InterCode(&(ast->code), gen_code(IC_ADD, ast->var_name, ast->fc->var_name, ast->fc->ns->ns->var_name));
-						Log("%s := %s + %s\n", ast->var_name, ast->fc->var_name, ast->fc->ns->ns->var_name);
-					} else if(strcmp(ast->fc->ns->type, "MINUS") == 0) {
-						list_push_back_InterCode(&(ast->code), gen_code(IC_SUB, ast->var_name, ast->fc->var_name, ast->fc->ns->ns->var_name));
-						Log("%s := %s - %s\n", ast->var_name, ast->fc->var_name, ast->fc->ns->ns->var_name);
-					} else if(strcmp(ast->fc->ns->type, "STAR") == 0) {
-						list_push_back_InterCode(&(ast->code), gen_code(IC_MUL, ast->var_name, ast->fc->var_name, ast->fc->ns->ns->var_name));
-						Log("%s := %s * %s\n", ast->var_name, ast->fc->var_name, ast->fc->ns->ns->var_name);
-					} else if(strcmp(ast->fc->ns->type, "DIV") == 0) {
-						list_push_back_InterCode(&(ast->code), gen_code(IC_DIV, ast->var_name, ast->fc->var_name, ast->fc->ns->ns->var_name));
-						Log("%s := %s / %s\n", ast->var_name, ast->fc->var_name, ast->fc->ns->ns->var_name);
-					} else if(strcmp(ast->fc->ns->type, "RELOP") == 0) {
-					}
-					*/
 				} else if(strcmp(ast->fc->ns->type, "LB") == 0) {
 					if(ast->fc->vt_syn && (ast->fc->vt_syn->kind != T_ARRAY)) {
 						typeerror(10, ast->fc->lineno, ast->fc->fc->val);
@@ -376,12 +328,6 @@ void semantic_analyse(struct Node *ast) {
 					typeerror(7, ast->fc->ns->lineno, NULL);
 				}
 				ast->vt_syn = ast->fc->ns->vt_syn;
-
-				/*list_merge_InterCode(&(ast->code), ast->fc->ns->code);
-				ast->var_name = new_temp();
-				list_push_back_InterCode(&(ast->code), gen_code(IC_SUB, ast->var_name, "#0", ast->fc->ns->var_name));
-				Log("%s := #0 - %s\n", ast->var_name, ast->fc->ns->var_name);
-				*/
 			} else if(strcmp(ast->fc->type, "NOT") == 0) {
 				if(!(ast->fc->ns->vt_syn && (ast->fc->ns->vt_syn->kind == T_BASIC) &&
 					(ast->fc->ns->vt_syn->basic == T_INT))) {
@@ -390,10 +336,6 @@ void semantic_analyse(struct Node *ast) {
 				ast->vt_syn = ast->fc->ns->vt_syn;
 			} else if(strcmp(ast->fc->type, "LP") == 0) {
 				ast->vt_syn = ast->fc->ns->vt_syn;
-
-				/*ast->var_name = ast->fc->ns->var_name;
-				ast->code = ast->fc->ns->code;
-				*/
 			}
 		} else if(strcmp(ast->type, "Specifier") == 0) { /* Specifier */
 			ast->vt_syn = ast->fc->vt_syn;
@@ -490,13 +432,7 @@ void semantic_analyse(struct Node *ast) {
 				if(type_match(ast->vt_syn, ast->fc->ns->vt_syn) == 0) {
 					typeerror(8, ast->fc->ns->lineno, NULL);
 				}
-
-				/*list_merge_InterCode(&(ast->code), ast->fc->code);
-				list_push_back_InterCode(&(ast->code), gen_code(IC_RET, ast->fc->ns->var_name, NULL, NULL));
-				Log("RETURN %s\n", ast->fc->ns->var_name);
-				*/
 			} else if(strcmp(ast->fc->type, "Exp") == 0) {
-				//ast->code = ast->fc->code;
 			} else if((strcmp(ast->fc->type, "IF") == 0) ||
 				(strcmp(ast->fc->type, "WHILE") == 0)) {
 				if(!(ast->fc->ns->ns->vt_syn && (ast->fc->ns->ns->vt_syn->kind == T_BASIC) &&

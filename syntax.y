@@ -43,15 +43,15 @@ int yyerror(char* msg);
 %%
 Program : ExtDefList		{ $$ = expand_node("Program", 1, $1);
 							  if(!lex_error){
-								  //semantic_analyse($$);
+								  semantic_analyse($$);
 								  //show_symbTable(curSymbTable);
 								  display($$);
-								  //print_code_list(translate_Program($$));
+								  print_code_list(translate_Program($$));
 							  }
 							  free_tree($$);
 							}
 	;
-ExtDefList :				{ $$ = NULL; /* $$ = expand_node("ExtDefList", 0);*/ }
+ExtDefList :				{ /*$$ = NULL;*/ $$ = expand_node("ExtDefList", 0); }
 	| ExtDef ExtDefList		{ $$ = expand_node("ExtDefList", 2, $1, $2); }
 	;
 ExtDef : Specifier ExtDecList SEMI	{ $$ = expand_node("ExtDef", 3, $1, $2, $3); }
@@ -72,7 +72,7 @@ Specifier : TYPE			{ $$ = expand_node("Specifier", 1, $1); }
 StructSpecifier : STRUCT OptTag LC DefList RC	{ $$ = expand_node("StructSpecifier", 5, $1, $2, $3, $4, $5); }
 	| STRUCT Tag			{ $$ = expand_node("StructSpecifier", 2, $1, $2); }
 	;
-OptTag :		{ $$ = NULL; /*$$ = expand_node("OptTag", 0);*/ }
+OptTag :		{ /*$$ = NULL;*/ $$ = expand_node("OptTag", 0); }
 	| ID		{ $$ = expand_node("OptTag", 1, $1); }
 	;
 Tag : ID		{ $$ = expand_node("Tag", 1, $1); }
@@ -95,7 +95,7 @@ ParamDec : Specifier VarDec		{ $$ = expand_node("ParamDec", 2, $1, $2); }
 CompSt : LC DefList StmtList RC { $$ = expand_node("CompSt", 4, $1, $2, $3, $4); }
 	| LC error	{ lex_error = 1; printf("Syntax error.\n"); }
 	;
-StmtList :		{ $$ = NULL; /*$$ = expand_node("StmtList", 0);*/ }
+StmtList :		{ /*$$ = NULL;*/ $$ = expand_node("StmtList", 0); }
 	| Stmt StmtList		{ $$ = expand_node("StmtList", 2, $1, $2); }
 	;
 Stmt : Exp SEMI			{ $$ = expand_node("Stmt", 2, $1, $2); }
@@ -108,7 +108,7 @@ Stmt : Exp SEMI			{ $$ = expand_node("Stmt", 2, $1, $2); }
 	| Exp error Stmt	{ lex_error = 1; printf("Missing \";\".\n"); }
 	;
 
-DefList:  { $$ = NULL; /*$$ = expand_node("DefList", 0);*/ }
+DefList:  { /*$$ = NULL;*/ $$ = expand_node("DefList", 0); }
 	| Def DefList	{ $$ = expand_node("DefList", 2, $1, $2); }
 	;
 Def : Specifier DecList SEMI	{ $$ = expand_node("Def", 3, $1, $2, $3); }

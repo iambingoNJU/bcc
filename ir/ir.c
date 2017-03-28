@@ -47,7 +47,6 @@ InterCode* gen_code(IC_TYPE code_type, char* res, char* op1, char* op2, char* op
 	return pic;
 }
 
-
 void print_code(InterCode* pic) {
 	Assert(pic, "Invalid code");
 	switch(pic->kind) {
@@ -64,7 +63,7 @@ void print_code(InterCode* pic) {
 		case IC_GOTO:		printf("GOTO %s\n", pic->res);								break;
 		case IC_COND:		printf("IF %s %s %s GOTO %s\n", pic->op1, pic->op, pic->op2, pic->res);				break;
 		case IC_RET:		printf("RETURN %s\n", pic->res);							break;
-		case IC_DEC:		printf("DEC %s %s\n", pic->res, pic->op1);				break;
+		case IC_DEC:		printf("DEC %s %s\n", pic->res, pic->op1);					break;
 		case IC_ARG:		printf("ARG %s\n", pic->res);								break;
 		case IC_ECALL:		printf("%s := CALL %s\n", pic->res, pic->op1);				break;
 		case IC_PARAM:		printf("PARAM %s\n", pic->res);								break;
@@ -80,3 +79,4 @@ void print_code_list(list_node_InterCode *h) {
 		h = h->next;
 	}
 }
+
