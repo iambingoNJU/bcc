@@ -2,16 +2,13 @@
 %{
 #include "lex.yy.c"
 #include "ir/translate.h"
+
 int yyerror(char* msg);
 %}
 
 /* declared types */
-
 %union {
-	//int type_int;
-	//float type_float;
 	struct Node* node;
-	//char str[64];
 }
 
 %token<node>		INT

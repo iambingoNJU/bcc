@@ -1,6 +1,7 @@
 %{
 #include "syntax.tab.h"
 #include "tree/bt.h"
+
 int lex_error = 0;
 %}
 
@@ -74,6 +75,7 @@ WHILE			while
 {ELSE}			{ yylval.node = init_node(yylineno, "ELSE", NULL); return ELSE; }
 {WHILE}			{ yylval.node = init_node(yylineno, "WHILE", NULL); return WHILE; }
 {ID}			{ yylval.node = init_node(yylineno, "ID", yytext); return ID;}
+
 .				{ lex_error = 1; printf("Error type A at Line %d: Mysterious characters \"%s\".\n", yylineno, yytext); }
 
 
