@@ -15,8 +15,7 @@ list_node_Item* list_find_Item(list_node_Item *h, char *name) {
 	return NULL;
 }
 
-void gen_basic_vt(V_type *pbvt, int t) {
-	Assert(pbvt, "gen_basic_vt error");
+V_type gen_basic_vt(int t) {
 	V_type nt = (V_type)malloc(sizeof(struct V_type_));
 	nt->kind = T_BASIC;
 	if(t == 1) {
@@ -24,29 +23,30 @@ void gen_basic_vt(V_type *pbvt, int t) {
 	} else if(t == 2) {
 		nt->basic = T_FLOAT;
 	}
-	*pbvt = nt;
+
 	//Log("Generating type %d", t);
+	return nt;
 }
 
-void gen_array_vt(V_type *pavt, V_type cvt, int sz) {
-	Assert(pavt, "gen_array_vt error");
+V_type gen_array_vt(V_type cvt, int sz) {
 	V_type nt = (V_type)malloc(sizeof(struct V_type_));
 	nt->kind = T_ARRAY;
 	nt->array.elem = cvt;
 	nt->array.sz = sz;
-	*pavt = nt;
+
 	//Log("Generating type array");
+	return nt;
 }
 
-void gen_struct_vt(V_type *psvt, char *name, list_node_Item *hf) {
-	Assert(psvt, "gen_struct_vt error");
+V_type gen_struct_vt(char *name, list_node_Item *hf) {
 	V_type nt = (V_type) malloc(sizeof(struct V_type_));
 	nt->kind = T_STRUCTURE;
 	if(name)	strcpy((nt->structure).name, name);
 	else (nt->structure).name[0] = '\0';
 	(nt->structure).field = hf;
-	*psvt = nt;
+
 	//Log("Generating type struct");
+	return nt;
 }
 
 int type_match(V_type t1, V_type t2) {

@@ -50,7 +50,7 @@ struct Node* expand_node(const char* t, int n, ...) {
 		}
 	} else {
 		tr->fc = NULL;
-		printf("Node '%s' has no child node.\n", t);
+		Log("Node '%s' has no child node.\n", t);
 		tr->lineno = -1;
 	}
 	va_end(arg_ptr);
@@ -147,7 +147,7 @@ void semantic_analyse(struct Node *ast) {
 				tmp->is_var = 1;
 			} else if((strcmp(ast->type, "VarDec") == 0) &&
 				(strcmp(tmp->type, "VarDec") == 0)) {
-				gen_array_vt(&(tmp->vt_syn), ast->vt_syn, (int)strtol(ast->fc->ns->ns->val, NULL, 0)) ;
+				tmp->vt_syn = gen_array_vt(ast->vt_syn, (int)strtol(ast->fc->ns->ns->val, NULL, 0)) ;
 			} else if(strcmp(ast->type, "FunDec") == 0) {
 				if(strcmp(tmp->type, "ID") == 0) {
 					tmp->vt_syn = ast->vt_syn;
@@ -208,14 +208,14 @@ void semantic_analyse(struct Node *ast) {
 		} else if(strcmp(ast->type, "Program") == 0) { /* Program */
 			check_undefined_func();
 		} else if(strcmp(ast->type, "INT") == 0) { /* INT */
-			gen_basic_vt(&(ast->vt_syn), 1);
+			ast->vt_syn = gen_basic_vt(1);
 		} else if(strcmp(ast->type, "FLOAT") == 0) { /* FLOAT */
-			gen_basic_vt(&(ast->vt_syn), 2);
+			ast->vt_syn = gen_basic_vt(2);
 		} else if(strcmp(ast->type, "TYPE") == 0) { /* TYPE */
 			if(strcmp(ast->val, "int") == 0) {
-				gen_basic_vt(&(ast->vt_syn), 1);
+				ast->vt_syn = gen_basic_vt(1);
 			} else if(strcmp(ast->val, "float") == 0) {
-				gen_basic_vt(&(ast->vt_syn), 2);
+				ast->vt_syn = gen_basic_vt(2);
 			}
 		} else if(strcmp(ast->type, "ID") == 0) { /* ID */
 			if(ast->is_var == 1) {
@@ -341,7 +341,7 @@ void semantic_analyse(struct Node *ast) {
 			ast->vt_syn = ast->fc->vt_syn;
 		} else if(strcmp(ast->type, "StructSpecifier") == 0) { /* StructSpecifier */
 			if((strcmp(ast->fc->ns->type, "OptTag") == 0) && ast->fc->ns->fc) {
-				gen_struct_vt(&(ast->fc->ns->fc->vt_syn), ast->fc->ns->fc->val, ast->fc->ns->ns->ns->vt_list);
+				ast->fc->ns->fc->vt_syn = gen_struct_vt(ast->fc->ns->fc->val, ast->fc->ns->ns->ns->vt_list);
 				if((query_type(ast->fc->ns->fc->val) == NULL) && (query_locale_var(ast->fc->ns->fc->val) == NULL)) {
 					add_var_to_symbol_table(ast->fc->ns->fc->val, ast->fc->ns->fc->vt_syn, 1);
 				} else {
@@ -353,7 +353,7 @@ void semantic_analyse(struct Node *ast) {
 				if(tvt == NULL) typeerror(17, ast->fc->ns->fc->lineno, ast->fc->ns->fc->val);
 				else { ast->vt_syn = tvt; ast->fc->ns->vt_syn = tvt; }
 			} else if(strcmp(ast->fc->ns->type, "LC") == 0) {
-				gen_struct_vt(&(ast->vt_syn), NULL, ast->fc->ns->ns->vt_list);
+				ast->vt_syn = gen_struct_vt(NULL, ast->fc->ns->ns->vt_list);
 			}
 		} else if((strcmp(ast->type, "DefList") == 0) && ast->fc) { /* DefList */
 			ast->vt_list = ast->fc->vt_list;

@@ -43,9 +43,10 @@ struct F_type_ {
 	list_node_Item *args;
 };
 
-void gen_basic_vt(V_type *pbvt, int t);
-void gen_array_vt(V_type *pavt, V_type cvt, int sz);
-void gen_struct_vt(V_type *psvt, char *name, list_node_Item *hf);
+V_type gen_basic_vt(int t);
+V_type gen_array_vt(V_type cvt, int sz);
+V_type gen_struct_vt(char *name, list_node_Item *hf);
+
 int type_match(V_type t1, V_type t2);
 void show_vtype(V_type t);
 int vt_size(V_type t);

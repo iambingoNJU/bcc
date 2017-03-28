@@ -33,8 +33,7 @@ void init_symbTable(pSymbTable pst) {
 // add some system function to global system table
 // curSymbTable must be GlobalSymbTable
 void add_sys_func() {
-	V_type vt;
-	gen_basic_vt(&vt, 1);
+	V_type vt = gen_basic_vt(1);
 
 	Item item;
 	strcpy(item.name, "");
