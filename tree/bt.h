@@ -26,9 +26,9 @@ struct Node {
 	struct Node *ns;
 };
 
-void init_node(struct Node**, int, const char*, char*);
+struct Node* init_node(int, const char*, char*);
 
-void expend(struct Node**, int, const char*, int, ...);
+struct Node* expand_node(const char* t, int n, ...);
 
 void free_tree(struct Node*);
 

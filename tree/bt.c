@@ -6,10 +6,11 @@
 int in_struct = 0;
 
 
-void init_node(struct Node** pn, int ln, const char* t, char* s) {
+struct Node* init_node(int ln, const char* t, char* s) {
 	struct Node* n = (struct Node*)malloc(sizeof(struct Node));
 	assert(n && t);
 	memset(n, 0, sizeof(struct Node));
+
 	strcpy(n->type, t);
 	if(s) strcpy(n->val, s);
 	else n->val[0] = '\0';
@@ -17,25 +18,28 @@ void init_node(struct Node** pn, int ln, const char* t, char* s) {
 	n->is_terminal = 1;
 	n->fc = NULL;
 	n->ns = NULL;	
-	*pn = n;
+
+	return n;
 }
 
-void expend(struct Node **ptr, int ln, const char* t, int n, ...) {
+struct Node* expand_node(const char* t, int n, ...) {
 	struct Node *temp, *arg, *tr = (struct Node*)malloc(sizeof(struct Node));
-	assert(tr && ptr && n >= 0);
+	assert(tr && (n >= 0));
 	memset(tr, 0, sizeof(struct Node));
+
 	strcpy(tr->type, t);
 	tr->val[0] = '\0';
-	tr->lineno = ln;
 	tr->is_terminal = 0;
 	tr->ns = NULL;
 	//There maybe exist NULL struct Node pointer.
+
 	va_list arg_ptr;
 	va_start(arg_ptr, n);
 	int i = 0;
 	while(!(arg = va_arg(arg_ptr, struct Node*))) i++;
 	if(i < n) {
 		tr->fc = arg;
+		tr->lineno = arg->lineno;
 		i++;
 		temp = tr->fc;
 		for(; i < n; i++) {
@@ -44,9 +48,14 @@ void expend(struct Node **ptr, int ln, const char* t, int n, ...) {
 				temp = temp->ns;
 			}
 		}
-	} else tr->fc = NULL;
-	*ptr = tr;
+	} else {
+		tr->fc = NULL;
+		printf("Node '%s' has no child node.\n", t);
+		tr->lineno = -1;
+	}
 	va_end(arg_ptr);
+
+	return tr;
 }
 
 void free_tree(struct Node *tr) {

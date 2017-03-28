@@ -47,33 +47,33 @@ WHILE			while
 					  c = next; next = input();
 					  } }
 
-{INT}			{ init_node(&yylval.node, yylineno, "INT", yytext); return INT; }
-{FLOAT}			{ init_node(&yylval.node, yylineno, "FLOAT", yytext); return FLOAT; }
-{SEMI}			{ init_node(&yylval.node, yylineno, "SEMI", NULL); return SEMI; }
-{COMMA}			{ init_node(&yylval.node, yylineno, "COMMA", NULL); return COMMA; }
-{ASSIGNOP}		{ init_node(&yylval.node, yylineno, "ASSIGNOP", NULL); return ASSIGNOP; }
-{RELOP}			{ init_node(&yylval.node, yylineno, "RELOP", yytext); return RELOP; }
-{PLUS}			{ init_node(&yylval.node, yylineno, "PLUS", NULL); return PLUS; }
-{MINUS}			{ init_node(&yylval.node, yylineno, "MINUS", NULL); return MINUS; }
-{STAR}			{ init_node(&yylval.node, yylineno, "STAR", NULL); return STAR; }
-{DIV}			{ init_node(&yylval.node, yylineno, "DIV", NULL); return DIV; }
-{AND}			{ init_node(&yylval.node, yylineno, "AND", NULL); return AND; }
-{OR}			{ init_node(&yylval.node, yylineno, "OR", NULL); return OR; }
-{DOT}			{ init_node(&yylval.node, yylineno, "DOT", NULL); return DOT; }
-{NOT}			{ init_node(&yylval.node, yylineno, "NOT", NULL); return NOT; }
-{TYPE}			{ init_node(&yylval.node, yylineno, "TYPE", yytext); return TYPE; }
-{LP}			{ init_node(&yylval.node, yylineno, "LP", NULL); return LP; }
-{RP}			{ init_node(&yylval.node, yylineno, "RP", NULL); return RP; }
-{LB}			{ init_node(&yylval.node, yylineno, "LB", NULL); return LB; }
-{RB}			{ init_node(&yylval.node, yylineno, "RB", NULL); return RB; }
-{LC}			{ init_node(&yylval.node, yylineno, "LC", NULL); return LC; }
-{RC}			{ init_node(&yylval.node, yylineno, "RC", NULL); return RC; }
-{STRUCT}		{ init_node(&yylval.node, yylineno, "STRUCT", NULL); return STRUCT; }
-{RETURN}		{ init_node(&yylval.node, yylineno, "RETURN", NULL); return RETURN; }
-{IF}			{ init_node(&yylval.node, yylineno, "IF", NULL); return IF; }
-{ELSE}			{ init_node(&yylval.node, yylineno, "ELSE", NULL); return ELSE; }
-{WHILE}			{ init_node(&yylval.node, yylineno, "WHILE", NULL); return WHILE; }
-{ID}			{ init_node(&yylval.node, yylineno, "ID", yytext); return ID;}
+{INT}			{ yylval.node = init_node(yylineno, "INT", yytext); return INT; }
+{FLOAT}			{ yylval.node = init_node(yylineno, "FLOAT", yytext); return FLOAT; }
+{SEMI}			{ yylval.node = init_node(yylineno, "SEMI", NULL); return SEMI; }
+{COMMA}			{ yylval.node = init_node(yylineno, "COMMA", NULL); return COMMA; }
+{ASSIGNOP}		{ yylval.node = init_node(yylineno, "ASSIGNOP", NULL); return ASSIGNOP; }
+{RELOP}			{ yylval.node = init_node(yylineno, "RELOP", yytext); return RELOP; }
+{PLUS}			{ yylval.node = init_node(yylineno, "PLUS", NULL); return PLUS; }
+{MINUS}			{ yylval.node = init_node(yylineno, "MINUS", NULL); return MINUS; }
+{STAR}			{ yylval.node = init_node(yylineno, "STAR", NULL); return STAR; }
+{DIV}			{ yylval.node = init_node(yylineno, "DIV", NULL); return DIV; }
+{AND}			{ yylval.node = init_node(yylineno, "AND", NULL); return AND; }
+{OR}			{ yylval.node = init_node(yylineno, "OR", NULL); return OR; }
+{DOT}			{ yylval.node = init_node(yylineno, "DOT", NULL); return DOT; }
+{NOT}			{ yylval.node = init_node(yylineno, "NOT", NULL); return NOT; }
+{TYPE}			{ yylval.node = init_node(yylineno, "TYPE", yytext); return TYPE; }
+{LP}			{ yylval.node = init_node(yylineno, "LP", NULL); return LP; }
+{RP}			{ yylval.node = init_node(yylineno, "RP", NULL); return RP; }
+{LB}			{ yylval.node = init_node(yylineno, "LB", NULL); return LB; }
+{RB}			{ yylval.node = init_node(yylineno, "RB", NULL); return RB; }
+{LC}			{ yylval.node = init_node(yylineno, "LC", NULL); return LC; }
+{RC}			{ yylval.node = init_node(yylineno, "RC", NULL); return RC; }
+{STRUCT}		{ yylval.node = init_node(yylineno, "STRUCT", NULL); return STRUCT; }
+{RETURN}		{ yylval.node = init_node(yylineno, "RETURN", NULL); return RETURN; }
+{IF}			{ yylval.node = init_node(yylineno, "IF", NULL); return IF; }
+{ELSE}			{ yylval.node = init_node(yylineno, "ELSE", NULL); return ELSE; }
+{WHILE}			{ yylval.node = init_node(yylineno, "WHILE", NULL); return WHILE; }
+{ID}			{ yylval.node = init_node(yylineno, "ID", yytext); return ID;}
 .				{ lex_error = 1; printf("Error type A at Line %d: Mysterious characters \"%s\".\n", yylineno, yytext); }
 
 
