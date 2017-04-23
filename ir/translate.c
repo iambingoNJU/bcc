@@ -1,21 +1,22 @@
+
 #include "translate.h"
 
 list_node_InterCode* translate_Exp(struct Node* exp, char* *place) {
 	Log("translate Exp: ");
-	Assert(exp && (strcmp(exp->type, "Exp") == 0), "Invalid expression: %s", exp->type);
+	Assert(exp && (exp->type == TYPE_Exp), "Invalid expression: %s", type_list[exp->type]);
 	list_node_InterCode* code = NULL;
 
-	if(strcmp(exp->fc->type, "INT") == 0) {				// Exp -> INT
+	if(exp->fc->type == TYPE_INT) {				// Exp -> INT
 		char *imm = (char*)malloc(12 * sizeof(char));
 		imm[0] = '#';
 		strcpy(imm + 1, exp->fc->val);
 		*place = imm;
-	} else if(strcmp(exp->fc->type, "FLOAT") == 0) {	// Exp -> FLOAT
+	} else if(exp->fc->type == TYPE_FLOAT) {	// Exp -> FLOAT
 		Assert(0, "I can't translate float number");
-	} else if(strcmp(exp->fc->type, "ID") == 0) {
+	} else if(exp->fc->type == TYPE_ID) {
 		if(exp->fc->ns == NULL) {						// Exp -> ID
 			*place = exp->fc->val;
-		} else if(strcmp(exp->fc->ns->ns->type, "RP") == 0) {	// Exp -> ID LP RP
+		} else if(exp->fc->ns->ns->type == TYPE_RP) {	// Exp -> ID LP RP
 			*place = new_temp();
 			if(strcmp(exp->fc->val, "read") == 0) {
 				list_push_back_InterCode(&code, gen_code(IC_READ, *place, NULL, NULL, NULL));
@@ -36,14 +37,14 @@ list_node_InterCode* translate_Exp(struct Node* exp, char* *place) {
 			}
 			list_push_back_InterCode(&code, gen_code(IC_ECALL, *place, exp->fc->val, NULL, NULL));
 		}
-	} else if(strcmp(exp->fc->type, "LP") == 0) {		// Exp -> LP Exp RP
+	} else if(exp->fc->type == TYPE_LP) {		// Exp -> LP Exp RP
 		code = translate_Exp(exp->fc->ns, place);
-	} else if(strcmp(exp->fc->type, "MINUS") == 0) {	// Exp -> MINUS Exp
+	} else if(exp->fc->type == TYPE_MINUS) {	// Exp -> MINUS Exp
 		char *t1 = NULL;
 		code = translate_Exp(exp->fc->ns, &t1);
 		*place = new_temp();
 		list_push_back_InterCode(&code, gen_code(IC_SUB, *place, "#0", t1, NULL));
-	} else if(strcmp(exp->fc->type, "NOT") == 0) {		// Exp -> NOT Exp
+	} else if(exp->fc->type == TYPE_NOT) {		// Exp -> NOT Exp
 		char *label1 = new_label();
 		char *label2 = new_label();
 		*place = new_temp();
@@ -53,8 +54,8 @@ list_node_InterCode* translate_Exp(struct Node* exp, char* *place) {
 		list_push_back_InterCode(&code, gen_code(IC_ASSIGN, *place, "#1", NULL, NULL));
 		list_push_back_InterCode(&code, gen_code(IC_LABEL, label2, NULL, NULL, NULL));
 	} else {
-		Assert(strcmp(exp->fc->type, "Exp") == 0, "Invalid expression");
-		if(strcmp(exp->fc->ns->type, "ASSIGNOP") == 0) {		// Exp ASSIGNOP Exp 
+		Assert(exp->fc->type == TYPE_Exp, "Invalid expression");
+		if(exp->fc->ns->type == TYPE_ASSIGNOP) {		// Exp ASSIGNOP Exp 
 			char *t1 = NULL;
 			char *t2 = NULL;
 			list_merge_InterCode(&code, translate_Exp(exp->fc, &t1));
@@ -63,37 +64,37 @@ list_node_InterCode* translate_Exp(struct Node* exp, char* *place) {
 			*place = t1;
 			//*place = new_temp();
 			//list_push_back_InterCode(&code, gen_code(IC_ASSIGN, *place, t1, NULL, NULL));
-		} else if(strcmp(exp->fc->ns->type, "PLUS") == 0) {		// Exp PLUS Exp 
+		} else if(exp->fc->ns->type == TYPE_PLUS) {		// Exp PLUS Exp 
 			char *t1 = NULL;
 			char *t2 = NULL;
 			list_merge_InterCode(&code, translate_Exp(exp->fc, &t1));
 			list_merge_InterCode(&code, translate_Exp(exp->fc->ns->ns, &t2));
 			*place = new_temp();
 			list_push_back_InterCode(&code, gen_code(IC_ADD, *place, t1, t2, NULL));
-		} else if(strcmp(exp->fc->ns->type, "MINUS") == 0) {		// Exp MINUS Exp 
+		} else if(exp->fc->ns->type == TYPE_MINUS) {		// Exp MINUS Exp 
 			char *t1 = NULL;
 			char *t2 = NULL;
 			list_merge_InterCode(&code, translate_Exp(exp->fc, &t1));
 			list_merge_InterCode(&code, translate_Exp(exp->fc->ns->ns, &t2));
 			*place = new_temp();
 			list_push_back_InterCode(&code, gen_code(IC_SUB, *place, t1, t2, NULL));
-		} else if(strcmp(exp->fc->ns->type, "STAR") == 0) {		// Exp STAR Exp 
+		} else if(exp->fc->ns->type == TYPE_STAR) {		// Exp STAR Exp 
 			char *t1 = NULL;
 			char *t2 = NULL;
 			list_merge_InterCode(&code, translate_Exp(exp->fc, &t1));
 			list_merge_InterCode(&code, translate_Exp(exp->fc->ns->ns, &t2));
 			*place = new_temp();
 			list_push_back_InterCode(&code, gen_code(IC_MUL, *place, t1, t2, NULL));
-		} else if(strcmp(exp->fc->ns->type, "DIV") == 0) {		// Exp DIV Exp 
+		} else if(exp->fc->ns->type == TYPE_DIV) {		// Exp DIV Exp 
 			char *t1 = NULL;
 			char *t2 = NULL;
 			list_merge_InterCode(&code, translate_Exp(exp->fc, &t1));
 			list_merge_InterCode(&code, translate_Exp(exp->fc->ns->ns, &t2));
 			*place = new_temp();
 			list_push_back_InterCode(&code, gen_code(IC_DIV, *place, t1, t2, NULL));
-		} else if((strcmp(exp->fc->ns->type, "AND") == 0) ||	// Exp AND Exp 
-				(strcmp(exp->fc->ns->type, "OR") == 0) ||		// Exp OR Exp 
-				(strcmp(exp->fc->ns->type, "RELOP") == 0)) {	// Exp RELOP Exp 
+		} else if((exp->fc->ns->type == TYPE_AND) ||	// Exp AND Exp 
+				(exp->fc->ns->type == TYPE_OR) ||		// Exp OR Exp 
+				(exp->fc->ns->type == TYPE_RELOP)) {	// Exp RELOP Exp 
 			char *label1 = new_label();
 			char *label2 = new_label();
 			*place = new_temp();
@@ -102,11 +103,11 @@ list_node_InterCode* translate_Exp(struct Node* exp, char* *place) {
 			list_push_back_InterCode(&code, gen_code(IC_LABEL, label1, NULL, NULL, NULL));
 			list_push_back_InterCode(&code, gen_code(IC_ASSIGN, *place, "#1", NULL, NULL));
 			list_push_back_InterCode(&code, gen_code(IC_LABEL, label2, NULL, NULL, NULL));
-		} else if(strcmp(exp->fc->ns->type, "LB") == 0) {		// Exp LB Exp RB
+		} else if(exp->fc->ns->type == TYPE_LB) {		// Exp LB Exp RB
 			char *t1 = NULL;
 			char *t2 = NULL;
 			char *t3 = new_temp();
-			if(strcmp(exp->fc->fc->type, "ID") != 0)
+			if(exp->fc->fc->type != TYPE_ID)
 				list_merge_InterCode(&code, translate_Exp(exp->fc, &t1));
 			else
 				t1 = "#0";
@@ -126,13 +127,13 @@ list_node_InterCode* translate_Exp(struct Node* exp, char* *place) {
 				**place = '*';
 				list_push_back_InterCode(&code, gen_code(IC_MUL, *place + 1, t3, "#4", NULL));
 				struct Node *tn = exp->fc;
-				while(strcmp(tn->type, "ID") != 0) tn = tn->fc;
+				while(tn->type != TYPE_ID) tn = tn->fc;
 				list_push_back_InterCode(&code, gen_code(IC_ADD, *place + 1, tn->val, *place + 1, NULL));
 			}
-		} else if(strcmp(exp->fc->ns->type, "DOT") == 0) {		// Exp DOT ID
-			Assert(strcmp(exp->fc->fc->type, "ID") == 0, "Too complex expression!");
+		} else if(exp->fc->ns->type == TYPE_DOT) {		// Exp DOT ID
+			Assert(exp->fc->fc->type == TYPE_ID, "Too complex expression!");
 			Assert(exp->fc->vt_syn->kind == T_STRUCTURE, "Invalid DOT usage.");
-			Assert(strcmp(exp->fc->ns->ns->type, "ID") == 0, "Too complex expression!");
+			Assert(exp->fc->ns->ns->type == TYPE_ID, "Too complex expression!");
 
 			int offset = 0;
 			char *name = exp->fc->ns->ns->val;
@@ -152,7 +153,7 @@ list_node_InterCode* translate_Exp(struct Node* exp, char* *place) {
 			**place = '*';
 			list_push_back_InterCode(&code, gen_code(IC_ADD, *place + 1, exp->fc->fc->val, imm, NULL));
 		} else {
-			Assert(0, "Invalid expression: %s", exp->type);
+			Assert(0, "Invalid expression: %s", type_list[exp->type]);
 		}
 	}
 
@@ -161,19 +162,19 @@ list_node_InterCode* translate_Exp(struct Node* exp, char* *place) {
 
 list_node_InterCode* translate_Stmt(struct Node* stmt) {
 	Log("translate Stmt: ");
-	Assert(stmt && (strcmp(stmt->type, "Stmt") == 0), "Invalid Stmt: %s", stmt->type);
+	Assert(stmt && (stmt->type == TYPE_Stmt), "Invalid Stmt: %s", type_list[stmt->type]);
 	list_node_InterCode *code = NULL;
 
-	if(strcmp(stmt->fc->type, "Exp") == 0) {				// Exp SEMI
+	if(stmt->fc->type == TYPE_Exp) {				// Exp SEMI
 		char *t1 = NULL;
 		code = translate_Exp(stmt->fc, &t1);
-	} else if(strcmp(stmt->fc->type, "CompSt") == 0) {		// CompSt
+	} else if(stmt->fc->type == TYPE_CompSt) {		// CompSt
 		code = translate_CompSt(stmt->fc);
-	} else if(strcmp(stmt->fc->type, "RETURN") == 0) {		// RETURN Exp SEMI
+	} else if(stmt->fc->type == TYPE_RETURN) {		// RETURN Exp SEMI
 		char *t1 = NULL;
 		code = translate_Exp(stmt->fc->ns, &t1);
 		list_push_back_InterCode(&code, gen_code(IC_RET, t1, NULL, NULL, NULL));
-	} else if(strcmp(stmt->fc->type, "IF") == 0) {
+	} else if(stmt->fc->type == TYPE_IF) {
 		if(stmt->fc->ns->ns->ns->ns->ns == NULL) {			// IF LP Exp RP Stmt
 			char *label1 = new_label();
 			char *label2 = new_label();
@@ -193,7 +194,7 @@ list_node_InterCode* translate_Stmt(struct Node* stmt) {
 			list_merge_InterCode(&code, translate_Stmt(stmt->fc->ns->ns->ns->ns->ns->ns));
 			list_push_back_InterCode(&code, gen_code(IC_LABEL, label3, NULL, NULL, NULL));
 		}
-	} else if(strcmp(stmt->fc->type, "WHILE") == 0) {		// WHILE LP Exp RP Stmt
+	} else if(stmt->fc->type == TYPE_WHILE) {		// WHILE LP Exp RP Stmt
 		char *label1 = new_label();
 		char *label2 = new_label();
 		char *label3 = new_label();
@@ -204,7 +205,7 @@ list_node_InterCode* translate_Stmt(struct Node* stmt) {
 		list_push_back_InterCode(&code, gen_code(IC_GOTO, label1, NULL, NULL, NULL));
 		list_push_back_InterCode(&code, gen_code(IC_LABEL, label3, NULL, NULL, NULL));
 	} else {
-		Assert(0, "Invalid statement: %s", stmt->type);
+		Assert(0, "Invalid statement: %s", type_list[stmt->type]);
 	}
 
 	return code;
@@ -212,29 +213,29 @@ list_node_InterCode* translate_Stmt(struct Node* stmt) {
 
 list_node_InterCode* translate_Cond(struct Node* cond, char *label_true, char *label_false) {
 	Log("translate Cond: ");
-	Assert(cond && (strcmp(cond->type, "Exp") == 0), "Invalid condtion: %s", cond->type);
+	Assert(cond && (cond->type == TYPE_Exp), "Invalid condtion: %s", type_list[cond->type]);
 	list_node_InterCode* code = NULL;
 
-	if(strcmp(cond->fc->type, "Exp") == 0) {
-		if(strcmp(cond->fc->ns->type, "RELOP") == 0) {
+	if(cond->fc->type == TYPE_Exp) {
+		if(cond->fc->ns->type == TYPE_RELOP) {
 			char *t1 = NULL;
 			char *t2 = NULL;
 			list_merge_InterCode(&code, translate_Exp(cond->fc, &t1));
 			list_merge_InterCode(&code, translate_Exp(cond->fc->ns->ns, &t2));
 			list_push_back_InterCode(&code, gen_code(IC_COND, label_true, t1, t2, cond->fc->ns->val));
 			list_push_back_InterCode(&code, gen_code(IC_GOTO, label_false, NULL, NULL, NULL));
-		} else if(strcmp(cond->fc->ns->type, "AND") == 0) {
+		} else if(cond->fc->ns->type == TYPE_AND) {
 			char *label1 = new_label();
 			list_merge_InterCode(&code, translate_Cond(cond->fc, label1, label_false));
 			list_push_back_InterCode(&code, gen_code(IC_LABEL, label1, NULL, NULL, NULL));
 			list_merge_InterCode(&code, translate_Cond(cond->fc->ns->ns, label_true, label_false));
-		} else if(strcmp(cond->fc->ns->type, "OR") == 0) {
+		} else if(cond->fc->ns->type == TYPE_OR) {
 			char *label1 = new_label();
 			list_merge_InterCode(&code, translate_Cond(cond->fc, label_true, label1));
 			list_push_back_InterCode(&code, gen_code(IC_LABEL, label1, NULL, NULL, NULL));
 			list_merge_InterCode(&code, translate_Cond(cond->fc->ns->ns, label_true, label_false));
 		}
-	} else if(strcmp(cond->fc->type, "NOT") == 0) {
+	} else if(cond->fc->type == TYPE_NOT) {
 		list_merge_InterCode(&code, translate_Cond(cond->fc->ns, label_false, label_true));
 	} else {
 		char *t1 = NULL;
@@ -248,7 +249,7 @@ list_node_InterCode* translate_Cond(struct Node* cond, char *label_true, char *l
 
 list_node_InterCode* translate_Dec(struct Node* dec) {
 	Log("translate Dec: ");
-	Assert(dec && (strcmp(dec->type, "Dec") == 0), "Invalid Dec: %s", dec->type);
+	Assert(dec && (dec->type == TYPE_Dec), "Invalid Dec: %s", type_list[dec->type]);
 	list_node_InterCode *code = NULL;
 
 	// Dec -> VarDec
@@ -258,7 +259,7 @@ list_node_InterCode* translate_Dec(struct Node* dec) {
 		char *t1 = NULL;
 		list_merge_InterCode(&code, translate_Exp(dec->fc->ns->ns, &t1));
 		struct Node *tmp = dec->fc->fc;
-		while(strcmp(tmp->type, "ID") != 0)
+		while(tmp->type != TYPE_ID)
 			tmp = tmp->fc;
 
 		assert(tmp != NULL);
@@ -270,7 +271,7 @@ list_node_InterCode* translate_Dec(struct Node* dec) {
 
 list_node_InterCode* translate_DecList(struct Node* list) {
 	Log("translate DecList: ");
-	Assert(list && (strcmp(list->type, "DecList") == 0), "Invalid DecList: %s", list->type);
+	Assert(list && (list->type == TYPE_DecList), "Invalid DecList: %s", type_list[list->type]);
 	list_node_InterCode *code = NULL;
 
 	// DecList -> Dec
@@ -284,7 +285,7 @@ list_node_InterCode* translate_DecList(struct Node* list) {
 
 list_node_InterCode* translate_Def(struct Node* def) {
 	Log("translate Def: ");
-	Assert(def && (strcmp(def->type, "Def") == 0), "Invalid Def: %s", def->type);
+	Assert(def && (def->type == TYPE_Def), "Invalid Def: %s", type_list[def->type]);
 	list_node_InterCode *code = NULL;
 
 	// Def -> Specifier DecList SEMI
@@ -295,7 +296,7 @@ list_node_InterCode* translate_Def(struct Node* def) {
 
 list_node_InterCode* translate_DefList(struct Node* list) {
 	Log("translate DefList: ");
-	Assert(list && (strcmp(list->type, "DefList") == 0), "Invalid DefList: %s", list->type);
+	Assert(list && (list->type == TYPE_DefList), "Invalid DefList: %s", type_list[list->type]);
 	list_node_InterCode *code = NULL;
 
 	// DefList -> NULL
@@ -310,7 +311,7 @@ list_node_InterCode* translate_DefList(struct Node* list) {
 
 list_node_InterCode* translate_StmtList(struct Node* list) {
 	Log("translate StmtList: ");
-	Assert(list && (strcmp(list->type, "StmtList") == 0), "Invalid StmtList: %s", list->type);
+	Assert(list && (list->type == TYPE_StmtList), "Invalid StmtList: %s", type_list[list->type]);
 	list_node_InterCode *code = NULL;
 
 	// StmtList -> NULL
@@ -325,7 +326,7 @@ list_node_InterCode* translate_StmtList(struct Node* list) {
 
 list_node_InterCode* translate_CompSt(struct Node* st) {
 	Log("translate CompSt: ");
-	Assert(st && (strcmp(st->type, "CompSt") == 0), "Invalid CompSt: %s", st->type);
+	Assert(st && (st->type == TYPE_CompSt), "Invalid CompSt: %s", type_list[st->type]);
 	list_node_InterCode* code = NULL;
 
 	// CompSt -> LC DefList StmtList RC
@@ -337,7 +338,7 @@ list_node_InterCode* translate_CompSt(struct Node* st) {
 
 list_node_InterCode* translate_Args(struct Node* args, list_node_Item **arg_list) {
 	Log("translate Args: ");
-	Assert(args && (strcmp(args->type, "Args") == 0), "Invalid Args: %s", args->type);
+	Assert(args && (args->type == TYPE_Args), "Invalid Args: %s", type_list[args->type]);
 	list_node_InterCode *code = NULL;
 
 	// Exp [COMMA, Args]
@@ -356,7 +357,7 @@ list_node_InterCode* translate_Args(struct Node* args, list_node_Item **arg_list
 
 list_node_InterCode* translate_FunDec(struct Node* fun) {
 	Log("translate FunDec: ");
-	Assert(fun && (strcmp(fun->type, "FunDec") == 0), "Invalid FunDec: %s", fun->type);
+	Assert(fun && (fun->type == TYPE_FunDec), "Invalid FunDec: %s", type_list[fun->type]);
 	list_node_InterCode *code = NULL;
 
 	// FunDec -> ID LP RP
@@ -364,7 +365,7 @@ list_node_InterCode* translate_FunDec(struct Node* fun) {
 	list_push_back_InterCode(&code, gen_code(IC_FUNC, fun->fc->val, NULL, NULL, NULL));
 
 	list_node_Item *args = NULL;
-	if(strcmp(fun->fc->ns->ns->type, "VarList") == 0)
+	if(fun->fc->ns->ns->type == TYPE_VarList)
 		args = fun->fc->ns->ns->vt_list;
 	while(args != NULL) {
 		list_push_back_InterCode(&code, gen_code(IC_PARAM, (args->data).name, NULL, NULL, NULL));
@@ -376,13 +377,13 @@ list_node_InterCode* translate_FunDec(struct Node* fun) {
 
 list_node_InterCode* translate_VarDec(struct Node* var) {
 	Log("translate VarDec: ");
-	Assert(var && (strcmp(var->type, "VarDec") == 0), "Invalid VarDec: %s", var->type);
+	Assert(var && (var->type == TYPE_VarDec), "Invalid VarDec: %s", type_list[var->type]);
 	list_node_InterCode *code = NULL;
 
 	// VarDec -> ID
 	// VarDec -> VarDec LB INT RB
 	struct Node *tmp = var->fc;
-	while(strcmp(tmp->type, "ID") != 0)
+	while(tmp->type != TYPE_ID)
 		tmp = tmp->fc;
 
 	int sz = vt_size(tmp->vt_syn);
@@ -397,7 +398,7 @@ list_node_InterCode* translate_VarDec(struct Node* var) {
 
 list_node_InterCode* translate_ExtDecList(struct Node* list) {
 	Log("translate ExtDecList: ");
-	Assert(list && (strcmp(list->type, "ExtDecList") == 0), "Invalid ExtDecList: %s", list->type);
+	Assert(list && (list->type == TYPE_ExtDecList), "Invalid ExtDecList: %s", type_list[list->type]);
 	list_node_InterCode *code = NULL;
 
 	if(list->fc->ns == NULL) {		// ExtDecList -> VarDec
@@ -412,15 +413,15 @@ list_node_InterCode* translate_ExtDecList(struct Node* list) {
 
 list_node_InterCode* translate_ExtDef(struct Node* extdef) {
 	Log("translate ExtDef: ");
-	Assert(extdef && (strcmp(extdef->type, "ExtDef") == 0), "Invalid ExtDef: %s", extdef->type);
+	Assert(extdef && (extdef->type == TYPE_ExtDef), "Invalid ExtDef: %s", type_list[extdef->type]);
 	list_node_InterCode *code = NULL;
 
-	if(strcmp(extdef->fc->ns->type, "SEMI") == 0) {						// ExtDef -> Specifier SEMI
-	} else if(strcmp(extdef->fc->ns->type, "ExtDecList") == 0) {		// ExtDef -> Specifier ExtDecList SEMI
+	if(extdef->fc->ns->type == TYPE_SEMI) {						// ExtDef -> Specifier SEMI
+	} else if(extdef->fc->ns->type == TYPE_ExtDecList) {		// ExtDef -> Specifier ExtDecList SEMI
 		list_merge_InterCode(&code, translate_ExtDecList(extdef->fc->ns));
-	} else if(strcmp(extdef->fc->ns->type, "FunDec") == 0) {
-		if(strcmp(extdef->fc->ns->ns->type, "SEMI") == 0) {				// ExtDef -> Specifier FunDec SEMI
-		} else if(strcmp(extdef->fc->ns->ns->type, "CompSt") == 0) {	// ExtDef -> Specifier FunDec CompSt
+	} else if(extdef->fc->ns->type == TYPE_FunDec) {
+		if(extdef->fc->ns->ns->type == TYPE_SEMI) {				// ExtDef -> Specifier FunDec SEMI
+		} else if(extdef->fc->ns->ns->type == TYPE_CompSt) {	// ExtDef -> Specifier FunDec CompSt
 			list_merge_InterCode(&code, translate_FunDec(extdef->fc->ns));
 			list_merge_InterCode(&code, translate_CompSt(extdef->fc->ns->ns));
 		}
@@ -431,7 +432,7 @@ list_node_InterCode* translate_ExtDef(struct Node* extdef) {
 
 list_node_InterCode* translate_ExtDefList(struct Node* list) {
 	Log("translate ExtDefList: ");
-	Assert(list && (strcmp(list->type, "ExtDefList") == 0), "Invalid ExtDefList: %s", list->type);
+	Assert(list && (list->type == TYPE_ExtDefList), "Invalid ExtDefList: %s", type_list[list->type]);
 	list_node_InterCode *code = NULL;
 
 	// ExtDefList -> NULL
@@ -446,7 +447,7 @@ list_node_InterCode* translate_ExtDefList(struct Node* list) {
 
 list_node_InterCode* translate_Program(struct Node* prog) {
 	Log("translate Program: ");
-	Assert(prog && (strcmp(prog->type, "Program") == 0), "Invalid Program: %s", prog->type);
+	Assert(prog && (prog->type == TYPE_Program), "Invalid Program: %s", type_list[prog->type]);
 	list_node_InterCode *code = NULL;
 
 	// Program -> ExtDefList

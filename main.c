@@ -1,5 +1,6 @@
 #include "syntax.tab.h"
 #include "tree/bt.h"
+#include "semantic/symbol_table.h"
 
 void yyrestart (FILE *input_file  );
 int yyparse (void);

@@ -2,13 +2,20 @@
 #define __BT_H__
 
 #include "../debug.h"
-#include "../semantic/symbol_table.h"
 #include "../semantic/type.h"
 
 extern int yylineno;
 
+enum {
+#define X(symbol) TYPE_##symbol,
+#include "token"
+#undef X
+};
+
+extern char* type_list[];
+
 struct Node {
-	char type[16];
+	int type;
 	char val[64];
 	int lineno;
 	int is_terminal;
@@ -26,11 +33,10 @@ struct Node {
 	struct Node *ns;
 };
 
-struct Node* init_node(int, const char*, char*);
-struct Node* expand_node(const char* t, int n, ...);
+struct Node* init_node(int ln, int t, char* s);
+struct Node* expand_node(int t, int n, ...);
 
 void free_tree(struct Node*);
 void display(struct Node*);
-void semantic_analyse(struct Node*);
 
 #endif
