@@ -35,6 +35,7 @@ V_type query_type(char *name);
 F_type query_func(char *name, int flag);
 
 void init_symbTable(pSymbTable pst);
+void show_symbTable(pSymbTable pst);
 void add_sys_func();
 void pushSymbTable();
 void popSymbTable();

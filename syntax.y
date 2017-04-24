@@ -3,6 +3,8 @@
 #include "lex.yy.c"
 #include "ir/translate.h"
 #include "semantic/attr_handler.h"
+#include "semantic/symbol_table.h"
+#include "options.h"
 
 int yyerror(char* msg);
 %}
@@ -44,10 +46,16 @@ int yyerror(char* msg);
 %%
 Program : ExtDefList		{ $$ = expand_node(TYPE_Program, 1, $1);
 							  if(!lex_error){
+								if(options[_SA].exist) {
 								  semantic_analyse($$);
+								}
 								  //show_symbTable(curSymbTable);
-								  //display($$);
+								if(options[_AST].exist) {
+								  display($$);
+								}
+								if(options[_PCL].exist) {
 								  print_code_list(translate_Program($$));
+								}
 							  }
 							  free_tree($$);
 							}
