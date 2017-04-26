@@ -1,8 +1,10 @@
 
+
 int f(int t[4][2])
 {
 	return t[3][0] + t[1][1];
 }
+
 
 int g(int x, int y, int z)
 {

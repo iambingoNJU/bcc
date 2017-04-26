@@ -9,11 +9,19 @@ void yyrestart (FILE *input_file  );
 int yyparse (void);
 
 Option options[] = {
-	{ "-f", "--file", 0, NULL },
-	{ "-ast", "--abstract-syntax-tree", 0, NULL },
-	{ "-sa", "--semantic-analyse", 0, NULL },
-	{ "-pcl", "--print-code-list", 0, NULL },
+	[_F] = { "-f", "--file", 0, NULL },
+	[_AST] = { "-ast", "--abstract-syntax-tree", 0, NULL },
+	[_SA] = { "-sa", "--semantic-analyse", 0, NULL },
+	[_PCL] = { "-pcl", "--print-code-list", 0, NULL },
+	[_H] = { "-h", "--help", 0, NULL },
 };
+
+void usage() {
+	printf("Usage: ./paser [option] [val]\n");
+	for(unsigned i = 0; i < ARRAY_SIZE(options); i ++) {
+		printf("%-6s - %s\n", options[i].arg, options[i].opt);
+	}
+}
 
 int main(int argc, char** argv) {
 
@@ -33,6 +41,11 @@ int main(int argc, char** argv) {
 		if(j == ARRAY_SIZE(options)) {
 			printf("Invalid argument: %s\n", argv[i]);
 		}
+	}
+
+	if(options[_H].exist) {
+		usage();
+		return 0;
 	}
 
 	FILE *f = NULL;

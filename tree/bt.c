@@ -53,7 +53,7 @@ struct Node* expand_node(int t, int n, ...) {
 		}
 	} else {
 		tr->fc = NULL;
-		Log("Node '%s' has no child node.\n", t);
+		Log("Node '%s' has no child node.\n", type_list[t]);
 		tr->lineno = -1;
 	}
 	va_end(arg_ptr);

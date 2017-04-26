@@ -1,16 +1,18 @@
+
 CC := gcc
 CFLAGS := -g -lfl -ly -Wall
 
-INC_FILE := $(shell find . -name "*.h")
-SRC_FILE := $(shell find . -path "./test" -prune -o -name "*.c" -print)
-SRC_FILE += syntax.tab.c
-
-.PHONY: lex syntax clean
-
+INC := $(shell find . -name "*.h")
+SRC := $(shell find . -path "./test" -prune -o -name "*.c" -print)
+SRC += syntax.tab.c
+#OBJ := $(subst .c,.o, $(SRC))
 TARGET := parser
 
-$(TARGET) : lex syntax $(SRC_FILE) $(INC_FILE)
-	$(CC) -o $@ $(SRC_FILE) $(CFLAGS)
+.PHONY: clean count
+
+
+$(TARGET): lex syntax $(SRC)
+	$(CC) -o $@ $(SRC) $(CFLAGS)
 
 lex: lexical.l
 	flex lexical.l
@@ -18,7 +20,11 @@ lex: lexical.l
 syntax: syntax.y
 	bison -d syntax.y
 
+count:
+	find . -name "*.c" -o -name "*.h" | xargs grep -v ^$$ | wc -l
+
 clean:
 	-rm lex.yy.c
 	-rm syntax.tab.*
 	-rm $(TARGET)
+	-rm core

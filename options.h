@@ -7,6 +7,7 @@ enum {
 	_AST,
 	_SA,
 	_PCL,
+	_H,
 };
 
 typedef struct {

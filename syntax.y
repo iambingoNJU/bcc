@@ -46,13 +46,16 @@ int yyerror(char* msg);
 %%
 Program : ExtDefList		{ $$ = expand_node(TYPE_Program, 1, $1);
 							  if(!lex_error){
-								if(options[_SA].exist) {
-								  semantic_analyse($$);
-								}
 								  //show_symbTable(curSymbTable);
+
 								if(options[_AST].exist) {
 								  display($$);
 								}
+
+								if(options[_SA].exist || options[_PCL].exist) {
+								  semantic_analyse($$);
+								}
+
 								if(options[_PCL].exist) {
 								  print_code_list(translate_Program($$));
 								}

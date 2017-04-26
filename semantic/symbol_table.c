@@ -69,7 +69,9 @@ void show_symbTable(pSymbTable pst) {
 }
 
 void dumpCurSymbTable() {
+	Log("current symbol table begins:");
 	show_symbTable(curSymbTable);
+	Log("current symbol table ends");
 }
 
 void freeSymbTable(pSymbTable pst) {

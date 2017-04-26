@@ -107,6 +107,7 @@ inh_helper(VarDec) {
 		child->is_var = 1;
 	} else if(child->type == TYPE_VarDec) {
 		child->vt_syn = gen_array_vt(father->vt_syn, (int)strtol(father->fc->ns->ns->val, NULL, 0)) ;
+		Log("Gen array type\n");
 	}
 
 	return 0;
