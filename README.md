@@ -1,7 +1,7 @@
 
 # bcc compliler
 
-  A simple c-- compiler for practice.
+  A simple c compiler's front-end.
 
 ## dependency
 * flex  `sudo apt-get install flex`
@@ -16,14 +16,14 @@ make
 options | argument | explaination
 --- | --- | ---
 -h | none | show help message
+-f | filename | input file name
 -ast | none | show abstract syntax tree
 -sa | none | show semantic analysis message
 -pcl | none | print intermediate code 
--f | filename | input file name
 
 
 ## contact
 Email: iambingonju@gmail.com
 
-[Compiler Priciples, Tecniques and Tools]
-2016.10
+## reference
+* Compiler Priciples, Tecniques and Tools
