@@ -6,7 +6,7 @@ INC := $(shell find . -name "*.h")
 SRC := $(shell find . -path "./test" -prune -o -name "*.c" -print)
 SRC += syntax.tab.c
 #OBJ := $(subst .c,.o, $(SRC))
-TARGET := parser
+TARGET := bcc
 
 .PHONY: clean count
 
